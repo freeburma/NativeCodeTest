@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "Category Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<br />
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+
+
+
+        <select name="categories" id="CategoryID" class="form-control" onchange="GetProducts();">
+            <option>--Select--</option>
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id">
+                    @item.Name
+                </option>
+            }
+            <option value="-1">Bad Category</option>
+        </select>
+
+    </div>
+
+    <!--
+        Products dropdown
+        When you select a category, it will make an ajax call.
+        Will write all the products return by the controller.
+        -->
+    @using (Html.BeginForm("EditProduct", "Product", FormMethod.Get))
+    {
+        <div class="col-md-4">
+            <select name="productID" id="ProductID"  class="form-control"></select>
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="Edit" />
+    }
+</div>
+
+<script>
+
+
+    function GetProducts()
+    {
+        var productDropdown = document.getElementById("ProductID");
+
+        // Clearing the pre-existing data.
+        productDropdown.innerHTML = "";
+
+
+        var _CategoryID = $("#CategoryID").val();
+
+        // alert(_CategoryID); // For testing purpose
+
+        //Get Products using Ajax and populate the product, $("#ProductID"), select list.
+
+        // The Ajax url to use is url: "/Home/ProductsInCategory"
+        $.ajax({
+            //Complete this.
+            type: "GET",
+            url: "/Home/ProductsInCategory",
+            data: {
+                categoryID: _CategoryID
+            },
+            success: function (result)
+            {
+                productDropdown = document.getElementById("ProductID");
+
+
+                // alert("Success" + result); // // For testing purpose
+
+                // Getting the product dropdown
+
+                // Adding the return data to the dropdown list
+                for (var i = 0; i < result.length; i++)
+                {
+                    // Creating option inside the dropdown
+                    var option = document.createElement('option');
+                    option.value = result[i].Id;
+                    option.text = result[i].ProductCode;
+                    productDropdown.add(option, result[i].Id);
+                }
+            },
+            error: function ()
+            {
+                alert("Error: Could not find the requested category.");
+            }
+
+            //Make sure you handle a bad response from the controller
+
+            //Populate the productid select list when you get a successful response.
+        });
+
+    }
+</script>
